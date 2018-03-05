@@ -1,11 +1,14 @@
 package com.linehrr.akka.http
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.pattern.ask
 import akka.util.Timeout
+import com.google.inject.name.Names
+import com.google.inject.{Guice, Injector, Key}
 import com.linehrr.akka.http.handler.ParseActor
+import com.linehrr.akka.http.injector.AppInjector
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -13,7 +16,10 @@ import scala.concurrent.duration._
 object MainServer extends HttpApp {
   override protected def routes: Route = {
 
-    val parseActorRef = ActorSystem("ParserSystem").actorOf(Props(new ParseActor), "parser")
+    val injector: Injector = Guice.createInjector(new AppInjector)
+
+    val system: ActorSystem = injector.getInstance(classOf[ActorSystem])
+    val parseActorRef = system.actorOf(Props[ParseActor])
 
     path("test") {
       get {

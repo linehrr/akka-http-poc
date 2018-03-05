@@ -1,18 +1,20 @@
 package com.linehrr.akka.http.handler
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
-import com.google.inject.{Guice, Injector}
+import com.google.inject.name.{Named, Names}
+import com.google.inject.{Guice, Injector, Key}
 import com.linehrr.akka.http.injector.AppInjector
+import javax.inject.Inject
 
 class ParseActor extends Actor {
 
   val injector: Injector = Guice.createInjector(new AppInjector)
-
+  val factory = injector.getInstance(Key.get(classOf[Factory], Names.named("worker")))
   val router: Router = {
     val routees = Vector.fill(5) {
 
-      val r = context.actorOf(Props(classOf[Worker], injector.getInstance(classOf[IParser])))
+      val r = factory.get()
       context watch r
       ActorRefRoutee(r)
     }
@@ -25,10 +27,3 @@ class ParseActor extends Actor {
   }
 }
 
-class Worker(parser: IParser) extends Actor {
-  override def receive: Receive = {
-    case (name: String, age: String) => {
-      sender() ! parser.parse(name, age)
-    }
-  }
-}
