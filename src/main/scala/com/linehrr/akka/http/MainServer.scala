@@ -21,7 +21,7 @@ object MainServer extends HttpApp {
       }
     } ~
     path("actor") {
-      implicit val timeout: Timeout = Timeout(100 milli)
+      implicit val timeout: Timeout = Timeout(500 milli)
       get {
         parameters('name, 'age) {
           (name, age) => {

@@ -1,7 +1,7 @@
 package com.linehrr.akka.http.handler
 
 import akka.actor.{Actor, Props}
-import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
+import akka.routing.{ActorRefRoutee, RandomRoutingLogic, Router, ScatterGatherFirstCompletedRoutingLogic}
 
 class ParseActor extends Actor {
 
@@ -12,8 +12,7 @@ class ParseActor extends Actor {
       ActorRefRoutee(r)
     }
 
-//    Router(SmallestMailboxRoutingLogic(), routees)
-    Router(RoundRobinRoutingLogic() ,routees)
+    Router(RandomRoutingLogic(), routees)
   }
 
   override def receive: Receive = {
