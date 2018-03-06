@@ -18,9 +18,9 @@ class MainServer extends HttpApp {
   override protected def routes: Route = {
     val parseActorRef = parserFactory.get()
 
-    path("test") {
+    path("auth") {
       get {
-        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>You are authenticated</h1><body>Just a joke...</body>"))
       }
     } ~
     path("actor") {
