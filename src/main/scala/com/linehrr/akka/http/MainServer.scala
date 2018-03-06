@@ -7,7 +7,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Injector, Key}
-import com.linehrr.akka.http.handler.ParseActor
+import com.linehrr.akka.http.handler.{Factory, ParseActor}
 import com.linehrr.akka.http.injector.AppInjector
 
 import scala.concurrent.Await
@@ -16,10 +16,8 @@ import scala.concurrent.duration._
 object MainServer extends HttpApp {
   override protected def routes: Route = {
 
-    val injector: Injector = Guice.createInjector(new AppInjector)
 
-    val system: ActorSystem = injector.getInstance(classOf[ActorSystem])
-    val parseActorRef = system.actorOf(Props[ParseActor])
+    val parseActorRef = AppInjector().getInstance(Key.get(classOf[Factory], Names.named("parser"))).get()
 
     path("test") {
       get {
