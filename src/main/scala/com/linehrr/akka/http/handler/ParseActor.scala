@@ -1,15 +1,13 @@
 package com.linehrr.akka.http.handler
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
-import com.google.inject.name.{Named, Names}
-import com.google.inject.{Guice, Injector, Key}
-import com.linehrr.akka.http.injector.AppInjector
+import com.google.inject.name.Named
 import javax.inject.Inject
 
-class ParseActor(factory: Factory) extends Actor {
+class ParseActor(factory: IFactory) extends Actor {
   val router: Router = {
-    val routees = Vector.fill(5) {
+    val routees = Vector.fill(20) {
 
       val r = factory.get()
       context watch r
@@ -21,14 +19,20 @@ class ParseActor(factory: Factory) extends Actor {
 
   override def receive: Receive = {
     case (name: String, age: String) => router.route((name, age), sender())
+    case Terminated(actor) => {
+      router.removeRoutee(actor)
+      val r = factory.get()
+      context watch r
+      router.addRoutee(r)
+    }
   }
 }
 
 @Named("parser")
-class ParserFactory extends Factory {
+class ParserFactory extends IFactory {
   @Inject var system: ActorSystem = null
 
-  @Inject @Named("worker") var workerFactory: Factory = null
+  @Inject @Named("worker") var workerFactory: IFactory = null
 
   override def get(): ActorRef = {
     system.actorOf(Props(classOf[ParseActor], workerFactory))
