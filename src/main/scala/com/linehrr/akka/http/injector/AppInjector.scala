@@ -1,9 +1,9 @@
 package com.linehrr.akka.http.injector
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.server.HttpApp
-import com.google.inject.name.{Named, Names}
-import com.google.inject.{AbstractModule, Guice, Injector, Provides}
+import com.google.inject._
+import com.google.inject.name.Names
 import com.linehrr.akka.http.MainServer
 import com.linehrr.akka.http.handler._
 import com.twg.logic.{IParameterParser, ParameterParser}
@@ -12,34 +12,27 @@ class AppInjector extends AbstractModule {
   override def configure(): Unit = {
     bind(classOf[ActorSystem]).toInstance(ActorSystem("AppActor"))
 
-    bind(classOf[IFactory])
-      .annotatedWith(Names.named("worker"))
+    bind(classOf[ActorFactory])
+      .annotatedWith(Names.named("parser-worker"))
       .to(classOf[WorkerFactory])
 
-    bind(classOf[IFactory])
+    bind(classOf[ActorFactory])
       .annotatedWith(Names.named("parser"))
-      .to(classOf[ParserFactory])
+      .to(classOf[ParseActorFactory])
 
     bind(classOf[HttpApp])
-      .annotatedWith(Names.named("test"))
       .to(classOf[MainServer])
-
-    bind(classOf[Actor])
-      .annotatedWith(Names.named("worker-actor"))
-      .to(classOf[Worker])
 
     bind(classOf[IParameterParser])
       .to(classOf[ParameterParser])
   }
-
-//  @Provides
-//  @Named("ParserActorWorker")
-//  def getParserActorWorker(system: ActorSystem): ActorRef = {
-//    system.actorOf(Props(classOf[Worker]))
-//  }
 }
 
 object AppInjector {
   val injector: Injector = Guice.createInjector(new AppInjector)
   def apply(): Injector = injector
+
+  def getMainServer: HttpApp = injector.getInstance(classOf[HttpApp])
+
+  def getParameterParser: IParameterParser = injector.getInstance(classOf[IParameterParser])
 }

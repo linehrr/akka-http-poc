@@ -1,22 +1,24 @@
 package com.linehrr.akka.http
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.google.inject.name.Named
-import com.linehrr.akka.http.handler.IFactory
+import com.linehrr.akka.http.handler.ActorFactory
 import javax.inject.Inject
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-@Named("test")
 class MainServer extends HttpApp {
-  @Inject @Named("parser") var parserFactory: IFactory = null
+
+  @Inject var system: ActorSystem = _
+  @Inject @Named("parser") var parser: ActorFactory = _
 
   override protected def routes: Route = {
-    val parseActorRef = parserFactory.get()
+    val parseActorRef = system.actorOf(parser.getActorProps)
 
     path("auth") {
       get {
@@ -24,7 +26,7 @@ class MainServer extends HttpApp {
       }
     } ~
     path("actor") {
-      implicit val timeout: Timeout = Timeout(15 seconds)
+      implicit val timeout: Timeout = Timeout(250 millisecond)
       get {
         parameters('name, 'age) {
           (name, age) => {
