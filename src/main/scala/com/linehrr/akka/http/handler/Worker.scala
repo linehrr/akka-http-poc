@@ -1,11 +1,18 @@
 package com.linehrr.akka.http.handler
 
+import akka.actor
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import com.google.inject.Inject
-import com.google.inject.name.Named
+import akka.routing.{DefaultResizer, RoundRobinPool}
+import com.google.inject.{Inject, Key}
+import com.google.inject.name.{Named, Names}
+import com.linehrr.akka.http.injector.AppInjector
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Appinfo
 import com.twg.logic.IParameterParser
 
-class Worker(parserLogic: IParameterParser) extends Actor {
+@Named("worker-actor")
+class Worker extends Actor {
+
+  @Inject var parserLogic:IParameterParser = null
 
   override def preStart(): Unit = {
     // init some objs
@@ -32,7 +39,10 @@ class WorkerFactory extends IFactory {
   @Inject var system: ActorSystem = null
 
   override def get(): ActorRef = {
-    @Inject var parserLogic: IParameterParser = null
-    system.actorOf(Props(classOf[Worker], parserLogic))
+    system.actorOf(Props(classOf[Worker]))
+  }
+
+  override def getActor(): Actor = {
+    AppInjector().getInstance(Key.get(classOf[Actor], Names.named("worker-actor")))
   }
 }

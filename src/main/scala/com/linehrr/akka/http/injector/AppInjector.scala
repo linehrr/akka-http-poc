@@ -24,6 +24,10 @@ class AppInjector extends AbstractModule {
       .annotatedWith(Names.named("test"))
       .to(classOf[MainServer])
 
+    bind(classOf[Actor])
+      .annotatedWith(Names.named("worker-actor"))
+      .to(classOf[Worker])
+
     bind(classOf[IParameterParser])
       .to(classOf[ParameterParser])
   }
