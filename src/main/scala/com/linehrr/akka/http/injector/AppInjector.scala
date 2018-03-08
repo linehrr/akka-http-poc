@@ -6,7 +6,8 @@ import com.google.inject._
 import com.google.inject.name.Names
 import com.linehrr.akka.http.MainServer
 import com.linehrr.akka.http.handler._
-import com.twg.logic.{IParameterParser, ParameterParser}
+import com.twg.logic.db.{IDB, RDS}
+import com.twg.logic.handler.{IParameterParser, ParameterParser}
 
 class AppInjector extends AbstractModule {
   override def configure(): Unit = {
@@ -25,6 +26,9 @@ class AppInjector extends AbstractModule {
 
     bind(classOf[IParameterParser])
       .to(classOf[ParameterParser])
+
+    bind(classOf[IDB])
+      .to(classOf[RDS])
   }
 }
 

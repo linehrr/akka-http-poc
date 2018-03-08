@@ -3,7 +3,7 @@ package com.linehrr.akka.http.handler
 import akka.actor.{Actor, Props}
 import com.google.inject.name.Named
 import com.linehrr.akka.http.injector.AppInjector
-import com.twg.logic.IParameterParser
+import com.twg.logic.handler.IParameterParser
 
 @Named("parser-worker")
 class WorkerFactory extends ActorFactory {
