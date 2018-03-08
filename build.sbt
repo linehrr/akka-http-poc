@@ -10,3 +10,5 @@ libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.0.11"
 // https://mvnrepository.com/artifact/com.google.inject/guice
 libraryDependencies += "com.google.inject" % "guice" % "4.0"
 
+// https://mvnrepository.com/artifact/org.json/json
+libraryDependencies += "org.json" % "json" % "20160810"

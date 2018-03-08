@@ -4,14 +4,16 @@ import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.ask
 import akka.routing._
 import akka.util.Timeout
+import com.google.inject.Singleton
 import com.google.inject.name.Named
 import javax.inject.Inject
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+@Singleton
 @Named("parser")
-class ParseActorFactory extends ActorFactory {
+class ParserActorFactory extends ActorFactory {
 
   @Inject @Named("parser-worker") var worker: ActorFactory = _
   class ParseActor extends Actor {

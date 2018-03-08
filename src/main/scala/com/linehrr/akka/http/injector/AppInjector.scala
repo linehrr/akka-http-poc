@@ -6,6 +6,7 @@ import com.google.inject._
 import com.google.inject.name.Names
 import com.linehrr.akka.http.MainServer
 import com.linehrr.akka.http.handler._
+import com.twg.logic.auth.{IAuth, UserAuth}
 import com.twg.logic.db.{IDB, RDS}
 import com.twg.logic.handler.{IParameterParser, ParameterParser}
 
@@ -19,7 +20,7 @@ class AppInjector extends AbstractModule {
 
     bind(classOf[ActorFactory])
       .annotatedWith(Names.named("parser"))
-      .to(classOf[ParseActorFactory])
+      .to(classOf[ParserActorFactory])
 
     bind(classOf[HttpApp])
       .to(classOf[MainServer])
@@ -29,6 +30,9 @@ class AppInjector extends AbstractModule {
 
     bind(classOf[IDB])
       .to(classOf[RDS])
+
+    bind(classOf[IAuth])
+      .to(classOf[UserAuth])
   }
 }
 
